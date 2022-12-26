@@ -1,0 +1,22 @@
+@import url('https://rsms.me/inter/inter.css');
+
+.card {
+        margin: 10vh; /* Added */
+        margin-left: 10vw;
+        margin-right:10vw;
+        float: none; /* Added */
+        margin-bottom: 10px; /* Added */
+        height: 80vh;
+        font-family: 'Inter';
+        border-radius: 40%;
+}
+
+.mail {
+        margin: 10px;
+        width:100%;
+}
+
+.password {
+        margin: 10px;
+        width:100%;
+}
