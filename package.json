@@ -25,6 +25,7 @@
     "bootstrap": "^5.2.3",
     "esri-loader": "^3.3.0",
     "firebase": "^9.15.0",
+    "jquery": "^3.6.3",
     "minimist": "^1.2.5",
     "ngx-bootstrap": "^10.2.0",
     "rxjs": "~7.5.0",
