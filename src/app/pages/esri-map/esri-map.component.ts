@@ -54,11 +54,11 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   graphicsLayer: esri.GraphicsLayer;
 
   // Attributes
-  zoom = 10;
-  center: Array<number> = [-118.73682450024377, 34.07817583063242];
+  zoom = 11;
+  center: Array<number> = [ -73.935242, 40.730610];
   basemap = "streets-vector";
   loaded = false;
-  pointCoords: number[] = [-118.73682450024377, 34.07817583063242];
+  pointCoords: number[] = [ -73.935242, 40.730610];
   dir: number = 0;
   count: number = 0;
   timeoutHandler = null;
@@ -105,7 +105,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.map = new Map(mapProperties);
 
       this.addFeatureLayers();
-      this.addPoint(this.pointCoords[1], this.pointCoords[0]);
 
       // Initialize the MapView
       const mapViewProperties = {
@@ -137,182 +136,12 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
   addFeatureLayers() {
     // Trailheads feature layer (points)
-    var trailheadsLayer: __esri.FeatureLayer = new this._FeatureLayer({
+    var restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
       url:
-        "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0"
+        "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0"
     });
 
-    this.map.add(trailheadsLayer);
-
-
-    // Trails feature layer (lines)
-    var trailsLayer: __esri.FeatureLayer = new this._FeatureLayer({
-      url:
-        "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0"
-    });
-
-    this.map.add(trailsLayer, 0);
-
-    // Parks and open spaces (polygons)
-    var parksLayer: __esri.FeatureLayer = new this._FeatureLayer({
-      url:
-        "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0"
-    });
-
-    this.map.add(parksLayer, 0);
-
-    console.log("feature layers added");
-  }
-
-  addPoint(lat: number, lng: number) {
-    this.graphicsLayer = new this._GraphicsLayer();
-    this.map.add(this.graphicsLayer);
-    const point = { //Create a point
-      type: "point",
-      longitude: lng,
-      latitude: lat
-    };
-    const simpleMarkerSymbol = {
-      type: "simple-marker",
-      color: [226, 119, 40],  // Orange
-      outline: {
-        color: [255, 255, 255], // White
-        width: 1
-      }
-    };
-    this.pointGraphic = new this._Graphic({
-      geometry: point,
-      symbol: simpleMarkerSymbol
-    });
-    this.graphicsLayer.add(this.pointGraphic);
-  }
-
-  removePoint() {
-    if (this.pointGraphic != null) {
-      this.graphicsLayer.remove(this.pointGraphic);
-    }
-  }
-
-  addRouter() {
-    const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
-
-    this.view.on("click", (event) => {
-      console.log("point clicked: ", event.mapPoint.latitude, event.mapPoint.longitude);
-      if (this.view.graphics.length === 0) {
-        addGraphic("origin", event.mapPoint);
-      } else if (this.view.graphics.length === 1) {
-        addGraphic("destination", event.mapPoint);
-        getRoute(); // Call the route service
-      } else {
-        this.view.graphics.removeAll();
-        addGraphic("origin", event.mapPoint);
-      }
-    });
-
-    var addGraphic = (type: any, point: any) => {
-      const graphic = new this._Graphic({
-        symbol: {
-          type: "simple-marker",
-          color: (type === "origin") ? "white" : "black",
-          size: "8px"
-        } as any,
-        geometry: point
-      });
-      this.view.graphics.add(graphic);
-    }
-
-    var getRoute = () => {
-      const routeParams = new this._RouteParameters({
-        stops: new this._FeatureSet({
-          features: this.view.graphics.toArray()
-        }),
-        returnDirections: true
-      });
-
-      this._Route.solve(routeUrl, routeParams).then((data: any) => {
-        for (let result of data.routeResults) {
-          result.route.symbol = {
-            type: "simple-line",
-            color: [5, 150, 255],
-            width: 3
-          };
-          this.view.graphics.add(result.route);
-        }
-
-        // Display directions
-        if (data.routeResults.length > 0) {
-          const directions: any = document.createElement("ol");
-          directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
-          directions.style.marginTop = "0";
-          directions.style.padding = "15px 15px 15px 30px";
-          const features = data.routeResults[0].directions.features;
-
-          let sum = 0;
-          // Show each direction
-          features.forEach((result: any, i: any) => {
-            sum += parseFloat(result.attributes.length);
-            const direction = document.createElement("li");
-            direction.innerHTML = result.attributes.text + " (" + result.attributes.length + " miles)";
-            directions.appendChild(direction);
-          });
-
-          sum = sum * 1.609344;
-          console.log('dist (km) = ', sum);
-
-          this.view.ui.empty("top-right");
-          this.view.ui.add(directions, "top-right");
-
-        }
-
-      }).catch((error: any) => {
-        console.log(error);
-      });
-    }
-  }
-
-  runTimer() {
-    this.timeoutHandler = setTimeout(() => {
-      // code to execute continuously until the view is closed
-      // ...
-      this.animatePointDemo();
-      this.runTimer();
-    }, 200);
-  }
-
-  animatePointDemo() {
-    this.removePoint();
-    switch (this.dir) {
-      case 0:
-        this.pointCoords[1] += 0.01;
-        break;
-      case 1:
-        this.pointCoords[0] += 0.02;
-        break;
-      case 2:
-        this.pointCoords[1] -= 0.01;
-        break;
-      case 3:
-        this.pointCoords[0] -= 0.02;
-        break;
-    }
-
-    this.count += 1;
-    if (this.count >= 10) {
-      this.count = 0;
-      this.dir += 1;
-      if (this.dir > 3) {
-        this.dir = 0;
-      }
-    }
-
-    this.addPoint(this.pointCoords[1], this.pointCoords[0]);
-  }
-
-  stopTimer() {
-    if (this.timeoutHandler != null) {
-      clearTimeout(this.timeoutHandler);
-      this.timeoutHandler = null;
-    }
+    this.map.add(restaurantsLayer);
 
   }
 
@@ -323,7 +152,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       console.log("mapView ready: ", this.view.ready);
       this.loaded = this.view.ready;
       this.mapLoadedEvent.emit(true);
-      this.runTimer();
     });
   }
 
@@ -332,6 +160,5 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       // destroy the map view
       this.view.container = null;
     }
-    this.stopTimer();
   }
 }

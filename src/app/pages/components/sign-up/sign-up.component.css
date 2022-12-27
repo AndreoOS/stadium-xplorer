@@ -1,0 +1,56 @@
+.background {
+        height: auto;
+        width: auto;
+        background-color:#27255C;
+}
+
+.card {
+        margin: 10vh; /* Added */
+        margin-left: 30vw;
+        margin-right:30vw;
+        margin-top:5vh;
+        float: none; /* Added */
+        margin-bottom: 10px; /* Added */
+        height: 90vh;
+        width: 40vw;
+        font-family: 'Inter';
+        border-radius: 40%;
+        align-content: center;
+}
+
+.card-title {
+       color: #27255C;
+       margin-left: 30px;
+       font-size: xx-large;
+}
+
+.card-img-top {
+        margin-top: -50px;
+        max-height: 100%;
+        max-width: 100%;
+}
+
+.btn-primary {
+        background-color: #27255C;
+        border-color: #27255C;
+}
+.btn-secondary {
+        background-color: #F6F8FD;
+        border-color: #9CA6CE;
+        color: #27255C;
+        margin-top: 8px;
+}
+
+.forgotPassword {
+        margin-top: 5px;
+        color: #9CA6CE;
+        font-size: 13px;
+        text-align: right;
+}
+
+.redirectToLogin {
+        margin-top: 18px;
+        text-align: center;
+        color: #27255C;
+        font-size: 18px;
+}

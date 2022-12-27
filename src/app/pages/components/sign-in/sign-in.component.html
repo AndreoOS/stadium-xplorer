@@ -1,40 +1,41 @@
-  <div class="card shadow p-3 mb-5 bg-white rounded" style="">
-    <h3 class="card-title">Sign In</h3>
-    <img class="card-img-top" src="../../../../assets/postare craciun.png" alt="Card image cap">
+<div class="background">
+<div class="card mx-auto shadow p-3 mb-5 bg-white rounded-1" style="">
+  <div class="card-body">
+    <h2 class="card-title">Log In</h2>
+    <img class="card-img-top " src="../../../../assets/sign-in-asset.svg" alt="Card image cap">
       <div class="displayTable">
         <div class="displayTableCell">
           <div class="authBlock">
             <div class="formGroup">
               <br>
-              <label class="mail">
-                <input id="mail" type="text" title="E-Mail" class="formControl" #userName required>
-                <span class="mail_label"> E-Mail </span>
-              </label>
-            <div class="formGroup">
-              <label for="password"> Password </label> <br>
-              <input type="password" class="formControl" placeholder="Password" #userPassword required>
-            </div>
-            <!-- Calling SignIn Api from AuthService -->
-            <div class="formGroup">
-              <input type="button" class="btn btnPrimary" value="Log in" (click)="authService.SignIn(userName.value, userPassword.value)">
-            </div>
-            <div class="formGroup">
-              <span class="or"><span class="orInner">Or</span></span>
-            </div>
-            <!-- Calling GoogleAuth Api from AuthService -->
-            <div class="formGroup">
-              <button type="button" class="btn googleBtn" (click)="authService.GoogleAuth()">
-                <i class="fab fa-google-plus-g"></i>
-                Log in with Google
-              </button>
+
+                <input id="mail" type="text" title="E-Mail" placeholder="Mail" class="formControl" #userName required style="width:100%">
+              <div class="formGroup">
+              <br>
+              <input type="password" class="formControl" placeholder="Password" #userPassword required style="width:100%">
             </div>
             <div class="forgotPassword">
-              <span routerLink="/forgot-password">Forgot Password?</span>
+              <a href="/forgot-password">Forgot Password?</a>
             </div>
+
+            <!-- Calling SignIn Api from AuthService -->
+              <br>
+              <input type="button" class="btn btn-block btn-primary" value="LOG IN" (click)="authService.SignIn(userName.value, userPassword.value)" style="width:100%">
+  
+              
+            <!-- Calling GoogleAuth Api from AuthService -->
+            <div class="formGroup">
+              <button type="button" class="btn btn-block btn-secondary" (click)="authService.GoogleAuth()" style="width:100%">
+                <img src="https://img.icons8.com/color/16/000000/google-logo.png"> Log in using Google
+              </button>
+            </div>
+            
+
           </div>
           <div class="redirectToLogin">
-            <span>Don't have an account?<span class="redirect" routerLink="/register-user"> Sign Up</span></span>
+            <span>Don't have an account?<a class="redirect" href="/register-user"> Sign Up </a></span>
           </div>
         </div>
       </div>
   </div>
+</div>
