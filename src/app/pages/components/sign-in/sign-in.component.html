@@ -1,25 +1,24 @@
 <div class="background">
 <div class="card mx-auto shadow p-3 mb-5 bg-white rounded-1" style="">
   <div class="card-body">
-    <h2 class="card-title">Log In</h2>
-    <img class="card-img-top " src="../../../../assets/sign-in-asset.svg" alt="Card image cap">
+    <h2 class="card-title">LOG IN</h2>
+    <div style="width:100%; text-align:center">
+      <img class="card-img-top" src="../../../../assets/log-in.svg">
+   </div>
       <div class="displayTable">
         <div class="displayTableCell">
           <div class="authBlock">
             <div class="formGroup">
-              <br>
-
-                <input id="mail" type="text" title="E-Mail" placeholder="Mail" class="formControl" #userName required style="width:100%">
-              <div class="formGroup">
-              <br>
-              <input type="password" class="formControl" placeholder="Password" #userPassword required style="width:100%">
-            </div>
-            <div class="forgotPassword">
-              <a href="/forgot-password">Forgot Password?</a>
-            </div>
+              <input id="mail" type="text" title="E-Mail" placeholder="Mail" class="formControl" #userName required style="width:100%">
+                <div class="formGroup">
+                <br>
+                <input type="password" class="formControl" placeholder="Password" #userPassword required style="width:100%">
+              </div>
+              <div class="forgotPassword">
+                <a href="/forgot-password">Forgot Password?</a>
+              </div>
 
             <!-- Calling SignIn Api from AuthService -->
-              <br>
               <input type="button" class="btn btn-block btn-primary" value="LOG IN" (click)="authService.SignIn(userName.value, userPassword.value)" style="width:100%">
   
               
