@@ -85,7 +85,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         "esri/rest/support/FeatureSet"
       ]);
 
-      // esriConfig.apiKey = "MY_API_KEY";
+      esriConfig.apiKey = "AAPK4038e29fa0f74e0b8de1e11638e315f7tQdieJSSWdSXfF2Pv3hfTdEnEDKViIoVKZcxNbpqpJujF5y3VG8epOt98WKFYzQ3";
 
       this._Map = Map;
       this._MapView = MapView;
@@ -124,42 +124,56 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       });
 
       await this.view.when(); // wait for map to load
-      console.log("ArcGIS map loaded");
-      // this.addRouter();
-      console.log(this.view.center);
+
+      
+      const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+      console.log(this.view.graphics);
       return this.view;
     } catch (error) {
       console.log("EsriLoader: ", error);
     }
-  }
 
+
+  }
+  
+  addGraphic(type, point) {
+      const graphic = new this._Graphic({
+        symbol: {
+          type: "simple-marker",
+          color: (type === "origin") ? "white" : "black",
+          size: "8px"
+        },
+        geometry: point
+      });
+      this.view.graphics.add(graphic);
+    }
 
   addFeatureLayers() {
     // Define a pop-up for Trailheads
     const Restaurantsheads = {
-      "title": "{NAME}",
-      "content": "<b>Id:</b> {ID}<br><b>Name:</b> {NAME}<br><b>Street Address:</b> " +
-          "{STREET_ADDRESS}<br><b>Location:</b> {LOCATION}<br><b>Type:</b> {TYPE}<br><b>No of Reviews:</b> " +
-          "{NO_REVIEWS}<br><b>Reviews:</b> {REVIEWS}<br><b>Comments:</b> {COMMENTS}<br><b>Contact Number:</b>" +
-          " {CONTACT_NUMBER}<br><b>Trip Advisor URL:</b> {TRIP_ADVISOR_URL}<br><b>Price Range:</b> {PRICE_RANGE}" +
-          "<br><b>Menu:</b> {MENU}<br><b>Latitude:</b> {LATITUDE}<br><b>Longitude:</b> {LONGITUDE}"
+      "title": "{NAME} [{PRICE_RANGE}]",
+      "content":  "This restaurant has <b> {REVIEWS}</b> based on {NO_OF_REVIEWS}. <br>" +
+      "<br> <b>Type:</b> {TYPE} " + 
+      "<br><b>Street Address:</b> {STREET_ADDRESS} " + 
+      "<br><b>Contact Number:</b> {CONTACT_NUMBER}" +
+      "<br><b>Menu:</b> {MENU}<br>" +
+      "<br><a href=\"{TRIP_ADVISOR_URL}\"> Click here to visit the Trip Advisor URL </a>"
     }
 
     // Trailheads feature layer (points)
     var restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
       url:
         "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0",
-      outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"N0_REVIEWS",
+      outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"NO_OF_REVIEWS",
         "REVIEWS",	"COMMENTS",	"CONTACT_NUMBER", "TRIP_ADVISOR_URL",	"PRICE_RANGE",
         "MENU",	"LATITUDE",	"LONGITUDE"],
       popupTemplate: Restaurantsheads
     });
 
     this.map.add(restaurantsLayer);
-
-
   }
 
+  
   ngOnInit() {
     // Initialize MapView and return an instance of MapView
     this.initializeMap().then(() => {
@@ -169,6 +183,23 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.mapLoadedEvent.emit(true);
     });
   }
+
+  ngOnChanges() {
+    console.log('in-click');
+    this.view.on("click", function(event){
+      console.log('click');
+      if (this.view.graphics.length === 0) {
+        this.addGraphic("origin", event.mapPoint);
+      } else if (this.view.graphics.length === 1) {
+        this.addGraphic("destination", event.mapPoint);
+
+      } else {
+        this.view.graphics.removeAll();
+        this.addGraphic("origin",event.mapPoint);
+      }
+
+    })
+  }  
 
   ngOnDestroy() {
     if (this.view) {
