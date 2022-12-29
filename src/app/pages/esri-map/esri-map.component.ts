@@ -121,10 +121,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       const origin = new Point([-74.003,40.73103]);
       const destination = new Point([-74.003,40.73103]);
 
-      this.view.when(()=>{
-
-      });
-
       this.view.on("click", (event)=>{
         if (this.view.graphics.length === 0) {
           this.addGraphic("start", event.mapPoint);
