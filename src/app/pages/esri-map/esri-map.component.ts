@@ -46,6 +46,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   _FeatureSet;
   _Point;
   _locator;
+  _Expand;
 
   // Instances
   map: esri.Map;
@@ -56,7 +57,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   // Attributes
   zoom = 11;
   center: Array<number> = [ -73.935242, 40.730610];
-  basemap = "streets-vector";
+  basemap = "arcgis-navigation";
   loaded = false;
   pointCoords: number[] = [ -73.935242, 40.730610];
   dir: number = 0;
@@ -72,7 +73,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       setDefaultOptions({ css: true });
 
       // Load the modules for the ArcGIS API for JavaScript
-      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet] = await loadModules([
+      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand] = await loadModules([
         "esri/config",
         "esri/Map",
         "esri/views/MapView",
@@ -82,7 +83,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         "esri/layers/GraphicsLayer",
         "esri/rest/route",
         "esri/rest/support/RouteParameters",
-        "esri/rest/support/FeatureSet"
+        "esri/rest/support/FeatureSet",
+        "esri/widgets/Expand"
       ]);
 
       esriConfig.apiKey = "AAPK4038e29fa0f74e0b8de1e11638e315f7tQdieJSSWdSXfF2Pv3hfTdEnEDKViIoVKZcxNbpqpJujF5y3VG8epOt98WKFYzQ3";
@@ -96,6 +98,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this._RouteParameters = RouteParameters;
       this._FeatureSet = FeatureSet;
       this._Point = Point;
+      this._Expand = Expand;
 
       // Configure the Map
       const mapProperties = {
@@ -115,6 +118,25 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       };
 
       this.view = new MapView(mapViewProperties);
+      const origin = new Point([-74.003,40.73103]);
+      const destination = new Point([-74.003,40.73103]);
+
+      this.view.when(()=>{
+
+      });
+
+      this.view.on("click", (event)=>{
+        if (this.view.graphics.length === 0) {
+          this.addGraphic("start", event.mapPoint);
+        }  else if (this.view.graphics.length === 1) {
+          this.addGraphic("finish", event.mapPoint);
+          this.getRoute();
+        } else {
+          this.view.graphics.removeAll();
+          this.view.ui.empty("top-right");
+          this.addGraphic("start",event.mapPoint);
+        }
+      });
 
       // Fires `pointer-move` event when user clicks on "Shift"
       // key and moves the pointer on the view.
@@ -124,9 +146,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       });
 
       await this.view.when(); // wait for map to load
-
-      
-      const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
       console.log(this.view.graphics);
       return this.view;
     } catch (error) {
@@ -135,19 +154,93 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
 
   }
-  
   addGraphic(type, point) {
-      const graphic = new this._Graphic({
-        symbol: {
-          type: "simple-marker",
-          color: (type === "origin") ? "white" : "black",
-          size: "8px"
-        },
-        geometry: point
+    let color = "#ffffff";
+    let outlineColor = "#000000"
+    let size = "12px";
+    if (type == "start") {
+      color = "#ffffff";
+    }  else {
+      color = "#96C6F9";
+      outlineColor = "#ffffff";
+    }
+    const graphic = new this._Graphic({
+      symbol: {
+        type: "simple-marker",
+        color: color,
+        size: size,
+        outline: {
+          color: outlineColor,
+          width: "1px"
+        }
+      },
+      geometry: point
+    });
+    this.view.graphics.add(graphic);
+  }
+
+  getRoute() {
+
+    const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+
+    const routeParams = new this._RouteParameters({
+      stops: new this._FeatureSet({
+        features: this.view.graphics.toArray()
+      }),
+      returnDirections: true,
+      directionsLanguage: "en"
+    });
+
+    this._Route.solve(routeUrl, routeParams)
+      .then((data)=> {
+        if (data.routeResults.length > 0) {
+          this.showRoute(data.routeResults[0].route);
+          this.showDirections(data.routeResults[0].directions.features);
+        }
+      })
+      .catch((error)=>{
+        console.log(error);
+      })
+  }
+
+  showRoute(routeResult) {
+
+    routeResult.symbol = {
+      type: "simple-line",
+      color: [63, 81, 186],
+      width: 3
+    };
+    this.view.graphics.add(routeResult,0);
+  }
+
+  showDirections(directions) {
+    function showRouteDirections(directions) {
+      const directionsList = document.createElement("ol");
+      directions.forEach(function(result,i){
+        const direction = document.createElement("li");
+        direction.innerHTML = result.attributes.text + ((result.attributes.length > 0) ? " (" + result.attributes.length.toFixed(2) + " miles)" : "");
+        directionsList.appendChild(direction);
       });
-      this.view.graphics.add(graphic);
+      directionsElement.appendChild(directionsList);
     }
 
+    const directionsElement = document.createElement("div");
+    directionsElement.innerHTML = "<h3>Directions</h3>";
+    directionsElement.style.marginTop = "0";
+    directionsElement.style.padding = "0 15px";
+    directionsElement.className =  "esri-widget esri-widget--panel esri-directions__scroller directions";
+    directionsElement.style.backgroundColor ="#FFFFFF"
+    directionsElement.style.minHeight = "365px";
+
+    showRouteDirections(directions);
+
+    this.view.ui.empty("top-right");
+    this.view.ui.add(new this._Expand({
+      view:this.view,
+      content:directionsElement,
+      expanded:true,
+      mode:"floating"}), "top-right");
+  }
   addFeatureLayers() {
     // Define a pop-up for Trailheads
     const Restaurantsheads = {
@@ -184,22 +277,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnChanges() {
-    console.log('in-click');
-    this.view.on("click", function(event){
-      console.log('click');
-      if (this.view.graphics.length === 0) {
-        this.addGraphic("origin", event.mapPoint);
-      } else if (this.view.graphics.length === 1) {
-        this.addGraphic("destination", event.mapPoint);
-
-      } else {
-        this.view.graphics.removeAll();
-        this.addGraphic("origin",event.mapPoint);
-      }
-
-    })
-  }  
 
   ngOnDestroy() {
     if (this.view) {

@@ -2,5 +2,14 @@
 // @import url('https://js.arcgis.com/4.12/esri/css/main.css');
 
 .esri-view {
-  height: 1000px;
-}
+  min-height: 100%;
+              
+  /* Set up proportionate scaling */
+  width: 100%;
+  height: auto;
+        
+  /* Set up positioning */
+  position: fixed;
+  top: 0;
+  left: 0;}
+
