@@ -135,13 +135,28 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
 
   addFeatureLayers() {
+    // Define a pop-up for Trailheads
+    const Restaurantsheads = {
+      "title": "{NAME}",
+      "content": "<b>Id:</b> {ID}<br><b>Name:</b> {NAME}<br><b>Street Address:</b> " +
+          "{STREET_ADDRESS}<br><b>Location:</b> {LOCATION}<br><b>Type:</b> {TYPE}<br><b>No of Reviews:</b> " +
+          "{NO_REVIEWS}<br><b>Reviews:</b> {REVIEWS}<br><b>Comments:</b> {COMMENTS}<br><b>Contact Number:</b>" +
+          " {CONTACT_NUMBER}<br><b>Trip Advisor URL:</b> {TRIP_ADVISOR_URL}<br><b>Price Range:</b> {PRICE_RANGE}" +
+          "<br><b>Menu:</b> {MENU}<br><b>Latitude:</b> {LATITUDE}<br><b>Longitude:</b> {LONGITUDE}"
+    }
+
     // Trailheads feature layer (points)
     var restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
       url:
-        "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0"
+        "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0",
+      outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"N0_REVIEWS",
+        "REVIEWS",	"COMMENTS",	"CONTACT_NUMBER", "TRIP_ADVISOR_URL",	"PRICE_RANGE",
+        "MENU",	"LATITUDE",	"LONGITUDE"],
+      popupTemplate: Restaurantsheads
     });
 
     this.map.add(restaurantsLayer);
+
 
   }
 
