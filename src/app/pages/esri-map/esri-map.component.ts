@@ -73,7 +73,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       setDefaultOptions({ css: true });
 
       // Load the modules for the ArcGIS API for JavaScript
-      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand] = await loadModules([
+      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand, Search] = await loadModules([
         "esri/config",
         "esri/Map",
         "esri/views/MapView",
@@ -84,7 +84,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         "esri/rest/route",
         "esri/rest/support/RouteParameters",
         "esri/rest/support/FeatureSet",
-        "esri/widgets/Expand"
+        "esri/widgets/Expand",
+        "esri/widgets/Search"
       ]);
 
       esriConfig.apiKey = "AAPK4038e29fa0f74e0b8de1e11638e315f7tQdieJSSWdSXfF2Pv3hfTdEnEDKViIoVKZcxNbpqpJujF5y3VG8epOt98WKFYzQ3";
@@ -107,7 +108,28 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
       this.map = new Map(mapProperties);
 
-      this.addFeatureLayers();
+      // Define a pop-up for Trailheads
+      const Restaurantsheads = {
+        "title": "{NAME} [{PRICE_RANGE}]",
+        "content":  "This restaurant has <b> {REVIEWS}</b> based on {NO_OF_REVIEWS}. <br>" +
+        "<br> <b>Type:</b> {TYPE} " +
+        "<br><b>Street Address:</b> {STREET_ADDRESS} " +
+        "<br><b>Contact Number:</b> {CONTACT_NUMBER}" +
+        "<br><b>Menu:</b> {MENU}<br>" +
+        "<br><a href=\"{TRIP_ADVISOR_URL}\"> Click here to visit the Trip Advisor URL </a>"
+      }
+
+      // Trailheads feature layer (points)
+      var restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
+        url:
+          "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0",
+        outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"NO_OF_REVIEWS",
+          "REVIEWS",	"COMMENTS",	"CONTACT_NUMBER", "TRIP_ADVISOR_URL",	"PRICE_RANGE",
+          "MENU",	"LATITUDE",	"LONGITUDE"],
+        popupTemplate: Restaurantsheads
+      });
+
+      this.map.add(restaurantsLayer);
 
       // Initialize the MapView
       const mapViewProperties = {
@@ -120,6 +142,42 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.view = new MapView(mapViewProperties);
       const origin = new Point([-74.003,40.73103]);
       const destination = new Point([-74.003,40.73103]);
+
+
+      //add Search Widget
+      const searchWidget =  new Search({
+        view: this.view,
+        allPlaceholder: "Search a location",
+        includeDefaultSources: false,
+        sources: [
+            {
+            layer: restaurantsLayer,
+            searchFields: ["NAME",	"STREET_ADDRESS"],
+            displayFields: ["NAME", "STREET_ADDRESS"],
+            exactMatch: false,
+            outFields: ["LOCATION"],
+            name: "NYC Restaurants",
+            placeholder: "Find a restaurant in NYC"
+            },
+            {
+              name: "All locations",
+              placeholder: "Search anything",
+              apiKey: esriConfig.apiKey,
+              singleLineFieldName: "SingleLine",
+              url: "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer"
+            }
+        ]
+      });
+
+      this.view.ui.add(searchWidget, {
+        position: "top-left",
+        index: 0,
+      });
+
+
+      this.view.when(()=>{
+
+      });
 
       this.view.on("click", (event)=>{
         if (this.view.graphics.length === 0) {
@@ -237,31 +295,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       expanded:true,
       mode:"floating"}), "top-right");
   }
-  addFeatureLayers() {
-    // Define a pop-up for Trailheads
-    const Restaurantsheads = {
-      "title": "{NAME} [{PRICE_RANGE}]",
-      "content":  "This restaurant has <b> {REVIEWS}</b> based on {NO_OF_REVIEWS}. <br>" +
-      "<br> <b>Type:</b> {TYPE} " + 
-      "<br><b>Street Address:</b> {STREET_ADDRESS} " + 
-      "<br><b>Contact Number:</b> {CONTACT_NUMBER}" +
-      "<br><b>Menu:</b> {MENU}<br>" +
-      "<br><a href=\"{TRIP_ADVISOR_URL}\"> Click here to visit the Trip Advisor URL </a>"
-    }
-
-    // Trailheads feature layer (points)
-    var restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
-      url:
-        "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0",
-      outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"NO_OF_REVIEWS",
-        "REVIEWS",	"COMMENTS",	"CONTACT_NUMBER", "TRIP_ADVISOR_URL",	"PRICE_RANGE",
-        "MENU",	"LATITUDE",	"LONGITUDE"],
-      popupTemplate: Restaurantsheads
-    });
-
-    this.map.add(restaurantsLayer);
-  }
-
   
   ngOnInit() {
     // Initialize MapView and return an instance of MapView
