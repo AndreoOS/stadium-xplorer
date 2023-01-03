@@ -1,11 +1,45 @@
 .background {
-        background-image: url(../../../../assets/nyc.jpg);
+        background-color:#27255C;
+        min-height: 100%;
+              
+        /* Set up proportionate scaling */
+        width: 100%;
+        height: auto;
+              
+        /* Set up positioning */
+        position: fixed;
+        top: 0;
+        left: 0;
 }
 
-.half-left {
-        float: left; 
-        width: 50vw;
-        height: 100vh;
-        background-color: #050324;
-        opacity: 0.8;
+
+.card {
+        background-color:#F6F8FD;
+        margin-top:5vh;
+        margin-bottom: 10px; /* Added */
+        height: 90vh;
+        font-family: 'Inter';
+}
+
+.btn-primary {
+        background-color: #27255C;
+        border-color: #27255C;
+        width: 100%;
+}
+
+.card-tile {
+        text-align: center;
+        float: center;
+}
+
+.card-img-top {
+        max-height: 90%;
+        max-width: 90%;
+        float: center;
+        margin-left:auto;
+        margin-right:auto;
+}
+
+.card-text {
+        margin-top: 5px;
 }

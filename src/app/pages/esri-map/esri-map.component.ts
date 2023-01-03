@@ -143,6 +143,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       const origin = new Point([-74.003,40.73103]);
       const destination = new Point([-74.003,40.73103]);
 
+
       //add Search Widget
       const searchWidget =  new Search({
         view: this.view,
