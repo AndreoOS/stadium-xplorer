@@ -15,8 +15,40 @@
   z-index: 1;
 }
 
+#cuisines-filter {
+  height: 360px;
+  width: 100%;
+  visibility: hidden;
+}
 
-  .my_button {
-    z-index: 2;
-    margin-right: 800px;  
-  }
+.cuisine-item {
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+  vertical-align: baseline;
+  cursor: pointer;
+  height: 40px;
+}
+
+.cuisine-item:focus {
+  background-color: dimgrey;
+}
+
+.cuisine-item:hover {
+  background-color: dimgrey;
+}
+
+#titleDiv {
+  padding: 10px;
+}
+
+#titleText {
+  font-size: 20pt;
+  font-weight: 60;
+  padding-bottom: 10px;
+}
+
+.my_button {
+  z-index: 2;
+  margin-right: 800px;  
+}

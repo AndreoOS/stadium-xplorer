@@ -120,7 +120,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       }
 
       // Trailheads feature layer (points)
-      var restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
+      const restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
         url:
           "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0",
         outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"NO_OF_REVIEWS",
@@ -192,6 +192,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         }
       });
 
+      this.filterData(restaurantsLayer);
       // Fires `pointer-move` event when user clicks on "Shift"
       // key and moves the pointer on the view.
       this.view.on('pointer-move', ["Shift"], (event) => {
@@ -231,6 +232,51 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       geometry: point
     });
     this.view.graphics.add(graphic);
+  }
+
+  filterData(restaurantsLayer) {
+
+    let floodLayerView;
+
+    const cuisinesNodes = document.querySelectorAll(`.cuisine-item`);
+    const cuisinesElement = document.getElementById("cuisines-filter");
+
+    // click event handler for cuisines choices
+    cuisinesElement.addEventListener("click", filterBycuisine);
+
+    // User clicked on Winter, Spring, Summer or Fall
+    // set an attribute filter on flood warnings layer view
+    // to display the warnings issued in that cuisine
+    function filterBycuisine(event) {
+      const selectedcuisine = event.target.getAttribute("data-cuisine");
+      console.log(selectedcuisine);
+      floodLayerView.filter = {
+            where: "Type LIKE '%" + selectedcuisine + "%'"
+      };
+    }
+
+    this.view.whenLayerView(restaurantsLayer).then((layerView) => {
+      // flash flood warnings layer loaded
+      // get a reference to the flood warnings layerview
+      floodLayerView = layerView;
+
+      // set up UI items
+      cuisinesElement.style.visibility = "visible";
+      const cuisinesExpand = new this._Expand({
+        view: this.view,
+        content: cuisinesElement,
+        expandIconClass: "esri-icon-filter",
+        group: "bottom-left"
+      });
+      //clear the filters when user closes the expand widget
+      cuisinesExpand.watch("expanded", () => {
+        if (!cuisinesExpand.expanded) {
+          floodLayerView.filter = null;
+        }
+      });
+      this.view.ui.add(cuisinesExpand, "top-left");
+      this.view.ui.add("titleDiv", "bottom-right");
+    });
   }
 
   getRoute() {
