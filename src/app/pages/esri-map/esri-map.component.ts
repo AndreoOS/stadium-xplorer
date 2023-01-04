@@ -126,7 +126,16 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"NO_OF_REVIEWS",
           "REVIEWS",	"COMMENTS",	"CONTACT_NUMBER", "TRIP_ADVISOR_URL",	"PRICE_RANGE",
           "MENU",	"LATITUDE",	"LONGITUDE"],
-        popupTemplate: Restaurantsheads
+        popupTemplate: Restaurantsheads,
+        /*symbol: {
+          type: "simple-marker",
+          color: "#f50be9",
+          size: "5px",
+          outline: {
+            color: "#3c255c",
+            width: "0.5px"
+          }
+        }*/
       });
 
       this.map.add(restaurantsLayer);
@@ -174,6 +183,18 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         index: 0,
       });
 
+      // Empire State
+      this.addPoint(-73.9857, 40.7484);
+      // Liberty Statue
+      this.addPoint(-74.0445, 40.6892);
+      // Central Park
+      this.addPoint(-73.9682, 40.7850);
+      // Times Square
+      this.addPoint(-73.9851, 40.7588);
+      // Brooklyn Bridge
+      this.addPoint(-73.9970, 40.7060);
+      // Grand Central Terminal
+      this.addPoint(-73.9772, 40.7526);
 
       this.view.when(()=>{
 
@@ -233,6 +254,29 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     });
     this.view.graphics.add(graphic);
   }
+
+  addPoint(long, lat) {
+    const empireStateBuildingPoint = {
+      type: "point",
+      longitude: long,
+      latitude: lat
+    };
+
+    const orangePointGraphic = new this._Graphic({
+      geometry: empireStateBuildingPoint,
+      symbol: {
+        type: "simple-marker",
+        color: "#0B20F5",
+        size: "10px",
+        outline: {
+          color: "#27255C",
+          width: "1px"
+        }
+      },
+    });
+
+    this.view.graphics.add(orangePointGraphic);
+}
 
   filterData(restaurantsLayer) {
 
