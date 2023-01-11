@@ -114,37 +114,57 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
       this.map = new Map(mapProperties);
 
-      // Define a pop-up for Trailheads
-      const Restaurantsheads = {
-        "title": "{NAME} [{PRICE_RANGE}]",
-        "content":  "This restaurant has <b> {REVIEWS}</b> based on {NO_OF_REVIEWS}. <br>" +
-        "<br> <b>Type:</b> {TYPE} " +
-        "<br><b>Street Address:</b> {STREET_ADDRESS} " +
-        "<br><b>Contact Number:</b> {CONTACT_NUMBER}" +
-        "<br><b>Menu:</b> {MENU}<br>" +
-        "<br><a href=\"{TRIP_ADVISOR_URL}\"> Click here to visit the Trip Advisor URL </a>"
+      const trailheadsRenderer = {
+        "type": "simple",
+        "symbol": {
+          "type": "picture-marker",
+          "url": "../../../../assets/restaurant-icon.svg",
+          "width": "18px",
+          "height": "18px"
+        }
       }
 
-      // Trailheads feature layer (points)
-      const restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
-        url:
-          "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0",
-        outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"NO_OF_REVIEWS",
-          "REVIEWS",	"COMMENTS",	"CONTACT_NUMBER", "TRIP_ADVISOR_URL",	"PRICE_RANGE",
-          "MENU",	"LATITUDE",	"LONGITUDE"],
-        popupTemplate: Restaurantsheads,
-        /*symbol: {
-          type: "simple-marker",
-          color: "#f50be9",
-          size: "5px",
-          outline: {
-            color: "#3c255c",
-            width: "0.5px"
-          }
-        }*/
-      });
+// Define a pop-up for Trailheads
+const Restaurantsheads = {
+  "title": "{NAME} [{PRICE_RANGE}]",
+  "content":  "This restaurant has <b> {REVIEWS}</b> based on {NO_OF_REVIEWS}. <br>" +
+  "<br> <b>Type:</b> {TYPE} " +
+  "<br><b>Street Address:</b> {STREET_ADDRESS} " +
+  "<br><b>Contact Number:</b> {CONTACT_NUMBER}" +
+  "<br><b>Menu:</b> {MENU}<br>" +
+  "<br><a href=\"{TRIP_ADVISOR_URL}\"> Click here to visit the Trip Advisor URL </a>"
+}
+const trailheadsLabels = {
+  symbol: {
+    type: "text",
+    color: "#FFFFFF",
+    haloColor: "#5E8D74",
+    haloSize: "2px",
+    font: {
+      size: "12px",
+      family: "Noto Sans",
+      style: "italic",
+      weight: "normal"
+    }
+  },
 
-      this.map.add(restaurantsLayer);
+  labelPlacement: "above-center"
+};
+
+// Trailheads feature layer (points)
+const restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
+  title: 'Restaurants',
+  url:
+    "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0",
+  outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"NO_OF_REVIEWS",
+    "REVIEWS",	"COMMENTS",	"CONTACT_NUMBER", "TRIP_ADVISOR_URL",	"PRICE_RANGE",
+    "MENU",	"LATITUDE",	"LONGITUDE"],
+  popupTemplate: Restaurantsheads,
+  renderer: trailheadsRenderer,
+  labelingInfo: [trailheadsLabels]
+});
+
+this.map.add(restaurantsLayer);
 
       // Initialize the MapView
       const mapViewProperties = {
@@ -155,9 +175,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       };
 
       this.view = new MapView(mapViewProperties);
-      const origin = new Point([-74.003,40.73103]);
-      const destination = new Point([-74.003,40.73103]);
-
 
       //add Search Widget
       const searchWidget =  new Search({
@@ -190,6 +207,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       });
 
       const attractionsLayer = new this._GraphicsLayer({
+        title: 'Tourist attractions',
         graphics: []
       });
       this.map.add(attractionsLayer);
@@ -206,9 +224,14 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       // Grand Central Terminal
       this.addPoint(-73.9772, 40.7526, attractionsLayer);
 
-      this.view.when(()=>{
+        this.view.when(() => {
+          const layerList = new LayerList({
+            view: this.view
+          });
 
-      });
+          // Add widget to the top right corner of the view
+          this.view.ui.add(layerList, "top-right");
+        });
 
       this.view.on("click", (event)=>{
         if (this.view.graphics.length === 0) {
