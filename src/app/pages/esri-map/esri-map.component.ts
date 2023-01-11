@@ -223,6 +223,23 @@ this.map.add(restaurantsLayer);
         index: 0,
       });
 
+      // Create helpful instructions
+              const sampleInstructions = document.createElement("div");
+              sampleInstructions.id = "sampleInstructions";
+              sampleInstructions.innerHTML =
+                "Use the top right toolbar to select a sketch tool or delete all sketched graphics.</br></br>Selecting a feature will allow you to move the feature, and modify vertices (polylines and polygons). If the feature is text, you will be able to move the feature and edit the text with the editor in the lower-left.</br></br>Click on the Save button to save as a new WebMap.";
+
+      this.view.ui.add(
+        [
+          new Expand({
+            expandIconClass: "esri-icon-question",
+            expandTooltip: "How to use this map",
+            view: this.view,
+            content: sampleInstructions,
+            group: "top-left"
+          })], "top-left"
+      );
+
       const attractionsLayer = new this._GraphicsLayer({
         title: 'Tourist attractions',
         graphics: []
@@ -278,7 +295,6 @@ this.map.add(restaurantsLayer);
     } catch (error) {
       console.log("EsriLoader: ", error);
     }
-
 
   }
 
@@ -344,7 +360,7 @@ this.map.add(restaurantsLayer);
             }
         ]
     });
-    this.view.ui.add(legend, "bottom-left");
+    this.view.ui.add(legend, "bottom-leading");
   }
 
 
