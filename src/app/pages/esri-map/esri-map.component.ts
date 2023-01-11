@@ -47,6 +47,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   _Point;
   _locator;
   _Expand;
+  _Legend;
+  _LayerList;
 
   // Instances
   map: esri.Map;
@@ -73,7 +75,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       setDefaultOptions({ css: true });
 
       // Load the modules for the ArcGIS API for JavaScript
-      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand, Search] = await loadModules([
+      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand, Search, Legend, LayerList] = await loadModules([
         "esri/config",
         "esri/Map",
         "esri/views/MapView",
@@ -85,7 +87,9 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         "esri/rest/support/RouteParameters",
         "esri/rest/support/FeatureSet",
         "esri/widgets/Expand",
-        "esri/widgets/Search"
+        "esri/widgets/Search",
+        "esri/widgets/Legend",
+        "esri/widgets/LayerList"
       ]);
 
       esriConfig.apiKey = "AAPK4038e29fa0f74e0b8de1e11638e315f7tQdieJSSWdSXfF2Pv3hfTdEnEDKViIoVKZcxNbpqpJujF5y3VG8epOt98WKFYzQ3";
@@ -100,6 +104,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this._FeatureSet = FeatureSet;
       this._Point = Point;
       this._Expand = Expand;
+      this._Legend = Legend;
+      this._LayerList = LayerList;
 
       // Configure the Map
       const mapProperties = {
@@ -183,18 +189,22 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         index: 0,
       });
 
+      const attractionsLayer = new this._GraphicsLayer({
+        graphics: []
+      });
+      this.map.add(attractionsLayer);
       // Empire State
-      this.addPoint(-73.9857, 40.7484);
+      this.addPoint(-73.9857, 40.7484, attractionsLayer);
       // Liberty Statue
-      this.addPoint(-74.0445, 40.6892);
+      this.addPoint(-74.0445, 40.6892, attractionsLayer);
       // Central Park
-      this.addPoint(-73.9682, 40.7850);
+      this.addPoint(-73.9682, 40.7850, attractionsLayer);
       // Times Square
-      this.addPoint(-73.9851, 40.7588);
+      this.addPoint(-73.9851, 40.7588, attractionsLayer);
       // Brooklyn Bridge
-      this.addPoint(-73.9970, 40.7060);
+      this.addPoint(-73.9970, 40.7060, attractionsLayer);
       // Grand Central Terminal
-      this.addPoint(-73.9772, 40.7526);
+      this.addPoint(-73.9772, 40.7526, attractionsLayer);
 
       this.view.when(()=>{
 
@@ -214,6 +224,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       });
 
       this.filterData(restaurantsLayer);
+      this.addLegend(restaurantsLayer, attractionsLayer);
       // Fires `pointer-move` event when user clicks on "Shift"
       // key and moves the pointer on the view.
       this.view.on('pointer-move', ["Shift"], (event) => {
@@ -255,7 +266,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     this.view.graphics.add(graphic);
   }
 
-  addPoint(long, lat) {
+  addPoint(long, lat, attractionsLayer) {
     const empireStateBuildingPoint = {
       type: "point",
       longitude: long,
@@ -275,8 +286,26 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       },
     });
 
-    this.view.graphics.add(orangePointGraphic);
+    attractionsLayer.add(orangePointGraphic);
 }
+
+  addLegend(restaurantsLayer, attractionsLayer) {
+    const legend = new this._Legend({
+        view: this.view,
+        layerInfos: [
+            {
+                layer: restaurantsLayer,
+                title: "Restaurants"
+            },
+            {
+                layer: attractionsLayer,
+                title: "Attractions"
+            }
+        ]
+    });
+    this.view.ui.add(legend, "bottom-left");
+  }
+
 
   filterData(restaurantsLayer) {
 
