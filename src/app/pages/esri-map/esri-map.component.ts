@@ -49,6 +49,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   _Expand;
   _Legend;
   _LayerList;
+  _Clock;
+  _MapImageLayer;
 
   // Instances
   map: esri.Map;
@@ -75,7 +77,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       setDefaultOptions({ css: true });
 
       // Load the modules for the ArcGIS API for JavaScript
-      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand, Search, Legend, LayerList] = await loadModules([
+      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand, Search, Legend, LayerList, Clock, MapImageLayer] = await loadModules([
         "esri/config",
         "esri/Map",
         "esri/views/MapView",
@@ -89,7 +91,9 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         "esri/widgets/Expand",
         "esri/widgets/Search",
         "esri/widgets/Legend",
-        "esri/widgets/LayerList"
+        "esri/widgets/LayerList",
+        "https://developers.arcgis.com/javascript/latest/sample-code/time-layer/live/clock.js",
+        "esri/layers/MapImageLayer"
       ]);
 
       esriConfig.apiKey = "AAPK4038e29fa0f74e0b8de1e11638e315f7tQdieJSSWdSXfF2Pv3hfTdEnEDKViIoVKZcxNbpqpJujF5y3VG8epOt98WKFYzQ3";
@@ -106,6 +110,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this._Expand = Expand;
       this._Legend = Legend;
       this._LayerList = LayerList;
+      this._Clock = Clock;
+      this._MapImageLayer = MapImageLayer;
 
       // Configure the Map
       const mapProperties = {
@@ -150,6 +156,17 @@ const trailheadsLabels = {
 
   labelPlacement: "above-center"
 };
+
+//add traffic layer
+const trafficLayer = new MapImageLayer({
+    url: "https://traffic.arcgis.com/arcgis/rest/services/World/Traffic/MapServer",
+    dpi: 48,
+    imageFormat: "png32",
+    refreshInterval: 1,
+    useViewTime: false
+});
+
+this.map.add(trafficLayer);
 
 // Trailheads feature layer (points)
 const restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
@@ -230,7 +247,7 @@ this.map.add(restaurantsLayer);
           });
 
           // Add widget to the top right corner of the view
-          this.view.ui.add(layerList, "top-right");
+          this.view.ui.add(layerList, "bottom-left");
         });
 
       this.view.on("click", (event)=>{
@@ -264,6 +281,7 @@ this.map.add(restaurantsLayer);
 
 
   }
+
   addGraphic(type, point) {
     let color = "#ffffff";
     let outlineColor = "#000000"
