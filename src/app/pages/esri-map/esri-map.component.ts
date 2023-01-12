@@ -226,9 +226,10 @@ this.map.add(restaurantsLayer);
 
       // Create helpful instructions
               const sampleInstructions = document.createElement("div");
+              sampleInstructions.setAttribute("style", "backgound-color: white");
               sampleInstructions.id = "sampleInstructions";
               sampleInstructions.innerHTML =
-                "Use the top right toolbar to select a sketch tool or delete all sketched graphics.</br></br>Selecting a feature will allow you to move the feature, and modify vertices (polylines and polygons). If the feature is text, you will be able to move the feature and edit the text with the editor in the lower-left.</br></br>Click on the Save button to save as a new WebMap.";
+                "Click on the blue icons to see the restaurants and their details.<br></br>You can filter them by cuisine (top left).<br></br> Select two points by clicking anywhere on the map to find the route between them.<br></br> You can hide/unhide layers from the layer list in the bottom left corner.";
 
       this.view.ui.add(
         [
@@ -354,14 +355,10 @@ this.map.add(restaurantsLayer);
             {
                 layer: restaurantsLayer,
                 title: "Restaurants"
-            },
-            {
-                layer: attractionsLayer,
-                title: "Attractions"
             }
         ]
     });
-    this.view.ui.add(legend, "bottom-leading");
+    this.view.ui.add(legend, "bottom-left");
   }
 
 
