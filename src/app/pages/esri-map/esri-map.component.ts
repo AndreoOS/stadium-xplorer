@@ -133,13 +133,14 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 // Define a pop-up for Trailheads
 const Restaurantsheads = {
   "title": "{NAME} [{PRICE_RANGE}]",
-  "content":  "This restaurant has <b> {REVIEWS}</b> based on {NO_OF_REVIEWS}. <br>" +
-  "<br> <b>Type:</b> {TYPE} " +
-  "<br><b>Street Address:</b> {STREET_ADDRESS} " +
-  "<br><b>Contact Number:</b> {CONTACT_NUMBER}" +
-  "<br><b>Menu:</b> {MENU}<br>" +
-  "<br><a href=\"{TRIP_ADVISOR_URL}\"> Click here to visit the Trip Advisor URL </a>"
-}
+  "content": "<br><img src='{IMAGE_URL}' height='150' width='200'><br>" +
+    "This restaurant has <b>{REVIEWS}</b> based on {NO_OF_REVIEWS}. <br>" +
+    "<br> <b>Type:</b> {TYPE} " +
+    "<br><b>Street Address:</b> {STREET_ADDRESS} " +
+    "<br><b>Contact Number:</b> {CONTACT_NUMBER}" +
+    "<br><b>Menu:</b> {MENU}<br>" +
+    "<br><a href='{TRIP_ADVISOR_URL}'> Click here to visit the Trip Advisor URL </a>"
+};
 const trailheadsLabels = {
   symbol: {
     type: "text",
@@ -172,10 +173,10 @@ this.map.add(trafficLayer);
 const restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
   title: 'Restaurants',
   url:
-    "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nyc_tripadvisor_restauarantrecommendation/FeatureServer/0",
+    "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nycrestaurants/FeatureServer/0",
   outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"NO_OF_REVIEWS",
     "REVIEWS",	"COMMENTS",	"CONTACT_NUMBER", "TRIP_ADVISOR_URL",	"PRICE_RANGE",
-    "MENU",	"LATITUDE",	"LONGITUDE"],
+    "MENU",	"LATITUDE",	"LONGITUDE", "IMAGE_URL"],
   popupTemplate: Restaurantsheads,
   renderer: trailheadsRenderer,
   labelingInfo: [trailheadsLabels]
