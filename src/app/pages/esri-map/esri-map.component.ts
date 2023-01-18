@@ -49,8 +49,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   _Expand;
   _Legend;
   _LayerList;
-  _Clock;
   _MapImageLayer;
+  _Home;
 
   // Instances
   map: esri.Map;
@@ -77,7 +77,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       setDefaultOptions({ css: true });
 
       // Load the modules for the ArcGIS API for JavaScript
-      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand, Search, Legend, LayerList, Clock, MapImageLayer] = await loadModules([
+      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand, Search, Legend, LayerList, MapImageLayer, Home] = await loadModules([
         "esri/config",
         "esri/Map",
         "esri/views/MapView",
@@ -92,8 +92,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         "esri/widgets/Search",
         "esri/widgets/Legend",
         "esri/widgets/LayerList",
-        "https://developers.arcgis.com/javascript/latest/sample-code/time-layer/live/clock.js",
-        "esri/layers/MapImageLayer"
+        "esri/layers/MapImageLayer",
+        "esri/widgets/Home"
       ]);
 
       esriConfig.apiKey = "AAPK4038e29fa0f74e0b8de1e11638e315f7tQdieJSSWdSXfF2Pv3hfTdEnEDKViIoVKZcxNbpqpJujF5y3VG8epOt98WKFYzQ3";
@@ -110,8 +110,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this._Expand = Expand;
       this._Legend = Legend;
       this._LayerList = LayerList;
-      this._Clock = Clock;
       this._MapImageLayer = MapImageLayer;
+      this._Home = Home;
 
       // Configure the Map
       const mapProperties = {
@@ -242,6 +242,11 @@ this.map.add(restaurantsLayer);
           })], "top-left"
       );
 
+      const homeBtn = new this._Home({
+          view: this.view
+      });
+      this.view.ui.add(homeBtn, "top-left");
+
       const attractionsLayer = new this._GraphicsLayer({
         title: 'Tourist attractions',
         graphics: []
@@ -266,7 +271,7 @@ this.map.add(restaurantsLayer);
           });
 
           // Add widget to the top right corner of the view
-          this.view.ui.add(layerList, "bottom-left");
+          this.view.ui.add(layerList, "bottom-leading");
         });
 
       this.view.on("click", (event)=>{
