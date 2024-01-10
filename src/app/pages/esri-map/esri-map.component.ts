@@ -23,6 +23,7 @@ import {
 } from "@angular/core";
 import { setDefaultOptions, loadModules } from 'esri-loader';
 import esri = __esri; // Esri TypeScript Types
+import { AttachmentsContent } from "esri/popup/content";
 
 @Component({
   selector: "app-esri-map",
@@ -51,6 +52,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   _LayerList;
   _MapImageLayer;
   _Home;
+  _AttachmentsContent;
 
   // Instances
   map: esri.Map;
@@ -59,11 +61,11 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   graphicsLayer: esri.GraphicsLayer;
 
   // Attributes
-  zoom = 11;
-  center: Array<number> = [ -73.935242, 40.730610];
+  zoom = 3;
+  center: Array<number> = [10.861647, 48.306584];
   basemap = "arcgis-navigation";
   loaded = false;
-  pointCoords: number[] = [ -73.935242, 40.730610];
+  pointCoords: number[] = [10.861647, 48.306584];
   dir: number = 0;
   count: number = 0;
   timeoutHandler = null;
@@ -77,7 +79,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       setDefaultOptions({ css: true });
 
       // Load the modules for the ArcGIS API for JavaScript
-      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand, Search, Legend, LayerList, MapImageLayer, Home] = await loadModules([
+      const [esriConfig, Map, MapView, FeatureLayer, Graphic, Point, GraphicsLayer, route, RouteParameters, FeatureSet, Expand, Search, Legend, LayerList, MapImageLayer, Home, AttachmentsContent] = await loadModules([
         "esri/config",
         "esri/Map",
         "esri/views/MapView",
@@ -93,7 +95,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         "esri/widgets/Legend",
         "esri/widgets/LayerList",
         "esri/layers/MapImageLayer",
-        "esri/widgets/Home"
+        "esri/widgets/Home",
+        "esri/popup/content/AttachmentsContent"
       ]);
 
       esriConfig.apiKey = "AAPK4038e29fa0f74e0b8de1e11638e315f7tQdieJSSWdSXfF2Pv3hfTdEnEDKViIoVKZcxNbpqpJujF5y3VG8epOt98WKFYzQ3";
@@ -112,6 +115,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this._LayerList = LayerList;
       this._MapImageLayer = MapImageLayer;
       this._Home = Home;
+      this._AttachmentsContent = AttachmentsContent
 
       // Configure the Map
       const mapProperties = {
@@ -120,28 +124,27 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
       this.map = new Map(mapProperties);
 
-      const trailheadsRenderer = {
+      const stadiumRenderer = {
         "type": "simple",
         "symbol": {
           "type": "picture-marker",
-          "url": "../../../../assets/restaurant-icon.svg",
-          "width": "18px",
-          "height": "18px"
+          "url": "../../../../assets/stadium-icon.svg",
+          "width": "23px",
+          "height": "23px"
         }
       }
 
-// Define a pop-up for Trailheads
-const Restaurantsheads = {
-  "title": "{NAME} [{PRICE_RANGE}]",
-  "content": "<br><img src='{IMAGE_URL}' height='150' width='200'><br>" +
-    "This restaurant has <b>{REVIEWS}</b> based on {NO_OF_REVIEWS}. <br>" +
-    "<br> <b>Type:</b> {TYPE} " +
-    "<br><b>Street Address:</b> {STREET_ADDRESS} " +
-    "<br><b>Contact Number:</b> {CONTACT_NUMBER}" +
-    "<br><b>Menu:</b> {MENU}<br>" +
-    "<br><a href='{TRIP_ADVISOR_URL}'> Click here to visit the Trip Advisor URL </a>"
-};
-const trailheadsLabels = {
+// Define a pop-up for Stadium
+const attachmentsElement = new AttachmentsContent({
+  displayType: "auto"
+})
+const stadiumHeads = {
+  "title": "{STADIUM_NAME} [{TOURNEY_NAME} - {SEASON}]",
+  "content": [attachmentsElement]+ 
+    "<br> <b>Attendance:</b> {ATTENDANCE}<br>" +
+    "<br> <b>Winner:</b> {CLUB_WINNER} " +
+    "<br><b>Runners-Up</b> {CLUB_RUNNERS_UP} "};
+const  stadiumLabels = {
   symbol: {
     type: "text",
     color: "#FFFFFF",
@@ -170,19 +173,17 @@ const trafficLayer = new MapImageLayer({
 this.map.add(trafficLayer);
 
 // Trailheads feature layer (points)
-const restaurantsLayer: __esri.FeatureLayer = new this._FeatureLayer({
-  title: 'Restaurants',
+const stadiumsLayer: __esri.FeatureLayer = new this._FeatureLayer({
+  title: 'Stadiums',
   url:
-    "https://services7.arcgis.com/pTj9WvqAiBmhC4U7/arcgis/rest/services/nycrestaurants/FeatureServer/0",
-  outFields: ["ID",	"NAME",	"STREET_ADDRESS",	"LOCATION",	"TYPE",	"NO_OF_REVIEWS",
-    "REVIEWS",	"COMMENTS",	"CONTACT_NUMBER", "TRIP_ADVISOR_URL",	"PRICE_RANGE",
-    "MENU",	"LATITUDE",	"LONGITUDE", "IMAGE_URL"],
-  popupTemplate: Restaurantsheads,
-  renderer: trailheadsRenderer,
-  labelingInfo: [trailheadsLabels]
+    "https://services.arcgis.com/emS4w7iyWEQiulAb/arcgis/rest/services/Champions_League_Final_Stadiums/FeatureServer",
+  outFields: ["*"],
+  popupTemplate: stadiumHeads,
+  renderer: stadiumRenderer,
+  labelingInfo: [stadiumLabels],
 });
 
-this.map.add(restaurantsLayer);
+this.map.add(stadiumsLayer);
 
       // Initialize the MapView
       const mapViewProperties = {
@@ -201,13 +202,13 @@ this.map.add(restaurantsLayer);
         includeDefaultSources: false,
         sources: [
             {
-            layer: restaurantsLayer,
-            searchFields: ["NAME",	"STREET_ADDRESS"],
-            displayFields: ["NAME", "STREET_ADDRESS"],
+            layer: stadiumsLayer,
+            searchFields: ["SEASON", "STADIUM_NAME"],
+            displayFields: ["SEASON", "STADIUM_NAME"],
             exactMatch: false,
-            outFields: ["LOCATION"],
-            name: "NYC Restaurants",
-            placeholder: "Find a restaurant in NYC"
+            outFields: ["STADIUM_CITY"],
+            name: "Stadiums",
+            placeholder: "Find a UCL Final Stadium"
             },
             {
               name: "All locations",
@@ -229,7 +230,7 @@ this.map.add(restaurantsLayer);
               sampleInstructions.setAttribute("style", "backgound-color: white");
               sampleInstructions.id = "sampleInstructions";
               sampleInstructions.innerHTML =
-                "Click on the blue icons to see the restaurants and their details.<br></br>You can filter them by cuisine (top left).<br></br> Select two points by clicking anywhere on the map to find the route between them.<br></br> You can hide/unhide layers from the layer list in the bottom left corner.";
+                "Click on the stadium icons to see the stadiums and the details about their finals.<br></br>You can filter them by decade (top left).<br></br> Select two points by clicking anywhere on the map to find the route between them.<br></br> You can hide/unhide layers from the layer list in the bottom left corner.";
 
       this.view.ui.add(
         [
@@ -287,8 +288,8 @@ this.map.add(restaurantsLayer);
         }
       });
 
-      this.filterData(restaurantsLayer);
-      this.addLegend(restaurantsLayer, attractionsLayer);
+      this.filterData(stadiumsLayer);
+      this.addLegend(stadiumsLayer, attractionsLayer);
       // Fires `pointer-move` event when user clicks on "Shift"
       // key and moves the pointer on the view.
       this.view.on('pointer-move', ["Shift"], (event) => {
@@ -353,13 +354,13 @@ this.map.add(restaurantsLayer);
     attractionsLayer.add(orangePointGraphic);
 }
 
-  addLegend(restaurantsLayer, attractionsLayer) {
+  addLegend(stadiumsLayer, attractionsLayer) {
     const legend = new this._Legend({
         view: this.view,
         layerInfos: [
             {
-                layer: restaurantsLayer,
-                title: "Restaurants"
+                layer: stadiumsLayer,
+                title: "Legend"
             }
         ]
     });
@@ -367,47 +368,47 @@ this.map.add(restaurantsLayer);
   }
 
 
-  filterData(restaurantsLayer) {
+  filterData(stadiumsLayer) {
 
     let floodLayerView;
 
-    const cuisinesNodes = document.querySelectorAll(`.cuisine-item`);
-    const cuisinesElement = document.getElementById("cuisines-filter");
+    const cuisinesNodes = document.querySelectorAll(`.decade-item`);
+    const decadesElement = document.getElementById("decades-filter");
 
     // click event handler for cuisines choices
-    cuisinesElement.addEventListener("click", filterBycuisine);
+    decadesElement.addEventListener("click", filterByDecade);
 
     // User clicked on Winter, Spring, Summer or Fall
     // set an attribute filter on flood warnings layer view
     // to display the warnings issued in that cuisine
-    function filterBycuisine(event) {
-      const selectedcuisine = event.target.getAttribute("data-cuisine");
-      console.log(selectedcuisine);
+    function filterByDecade(event) {
+      const selectedDecade = event.target.getAttribute("data-decade");
+      console.log(selectedDecade);
       floodLayerView.filter = {
-            where: "Type LIKE '%" + selectedcuisine + "%'"
+            where: "Decade LIKE '%" + selectedDecade + "%'"
       };
     }
 
-    this.view.whenLayerView(restaurantsLayer).then((layerView) => {
+    this.view.whenLayerView(stadiumsLayer).then((layerView) => {
       // flash flood warnings layer loaded
       // get a reference to the flood warnings layerview
       floodLayerView = layerView;
 
       // set up UI items
-      cuisinesElement.style.visibility = "visible";
-      const cuisinesExpand = new this._Expand({
+      decadesElement.style.visibility = "visible";
+      const decadesExpand = new this._Expand({
         view: this.view,
-        content: cuisinesElement,
+        content: decadesElement,
         expandIconClass: "esri-icon-filter",
         group: "bottom-left"
       });
       //clear the filters when user closes the expand widget
-      cuisinesExpand.watch("expanded", () => {
-        if (!cuisinesExpand.expanded) {
+      decadesExpand.watch("expanded", () => {
+        if (!decadesExpand.expanded) {
           floodLayerView.filter = null;
         }
       });
-      this.view.ui.add(cuisinesExpand, "top-left");
+      this.view.ui.add(decadesExpand, "top-left");
       this.view.ui.add("titleDiv", "bottom-right");
     });
   }

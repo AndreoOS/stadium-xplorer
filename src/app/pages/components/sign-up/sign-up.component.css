@@ -1,5 +1,5 @@
 .background {
-        background-color:#27255C;
+        background-color:#0E1E5B;
         min-height: 100%;
               
         /* Set up proportionate scaling */
@@ -28,35 +28,33 @@
 }
 
 .card-title {
-       color: #27255C;
-       margin-left: 30px;
+       color: #0E1E5B;
        font-size: xx-large;
-       margin-top:-20px;
+       text-align: center;
 }
 
 .card-img-top {
-        max-height: 90%;
-        max-width: 90%;
-        float: center;
-        margin-top:-25px;
+        max-height: 75%;
+        max-width: 75%;
+        height: auto;
         margin-left:auto;
         margin-right:auto;
 }
 
 .btn-primary {
-        background-color: #27255C;
-        border-color: #27255C;
+        background-color: #0E1E5B;
+        border-color: #0E1E5B;
 }
 .btn-secondary {
         background-color: #F6F8FD;
-        border-color: #9CA6CE;
-        color: #27255C;
+        border-color: #6594C0;
+        color: #0E1E5B;
         margin-top: 8px;
 }
 
 .forgotPassword {
         margin-top: 5px;
-        color: #9CA6CE;
+        color: #6594C0;
         font-size: 13px;
         text-align: right;
 }
@@ -64,6 +62,6 @@
 .redirectToLogin {
         margin-top: 18px;
         text-align: center;
-        color: #27255C;
+        color: #0E1E5B;
         font-size: 18px;
 }

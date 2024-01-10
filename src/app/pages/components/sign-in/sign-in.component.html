@@ -1,9 +1,9 @@
 <div class="background">
-<div class="card mx-auto shadow p-3 mb-5 bg-white rounded-1" style="">
+<div class="card mx-auto shadow p-3 mb-5 bg-white rounded-1">
   <div class="card-body">
-    <h2 class="card-title">LOG IN</h2>
+    <h2 class="card-title align-self-center">LOG IN</h2>
     <div style="width:100%; text-align:center">
-      <img class="card-img-top" src="../../../../assets/log-in.svg">
+      <img class="card-img-top" src="../../../../assets/log-in.png">
    </div>
       <div class="displayTable">
         <div class="displayTableCell">
@@ -19,7 +19,7 @@
               </div>
 
             <!-- Calling SignIn Api from AuthService -->
-              <input type="button" class="btn btn-block btn-primary" value="LOG IN" (click)="authService.SignIn(userName.value, userPassword.value)" style="width:100%">
+              <input type="button" class="btn btn-block btn-primary my-3" value="LOG IN" (click)="authService.SignIn(userName.value, userPassword.value)" style="width:100%">
   
               
             <!-- Calling GoogleAuth Api from AuthService -->

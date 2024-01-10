@@ -15,13 +15,12 @@
   z-index: 1;
 }
 
-#cuisines-filter {
-  height: 360px;
+#decades-filter {
   width: 100%;
   visibility: hidden;
 }
 
-.cuisine-item {
+.decade-item {
   width: 100%;
   padding: 12px;
   text-align: center;
@@ -30,7 +29,7 @@
   height: 40px;
 }
 
-.cuisine-item:focus {
+.decade-item:focus {
   background-color: dimgrey;
 }
 
