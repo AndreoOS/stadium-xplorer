@@ -140,8 +140,7 @@ const attachmentsElement = new AttachmentsContent({
 })
 const stadiumHeads = {
   "title": "{STADIUM_NAME} [{TOURNEY_NAME} - {SEASON}]",
-  "content": [attachmentsElement]+ 
-    "<br> <b>Attendance:</b> {ATTENDANCE}<br>" +
+  "content": "<br> <b>Attendance:</b> {ATTENDANCE}<br>" +
     "<br> <b>Winner:</b> {CLUB_WINNER} " +
     "<br><b>Runners-Up</b> {CLUB_RUNNERS_UP} "};
 const  stadiumLabels = {
@@ -167,7 +166,8 @@ const trafficLayer = new MapImageLayer({
     dpi: 48,
     imageFormat: "png32",
     refreshInterval: 1,
-    useViewTime: false
+    useViewTime: false,
+    minScale: 7,
 });
 
 this.map.add(trafficLayer);
@@ -253,18 +253,23 @@ this.map.add(stadiumsLayer);
         graphics: []
       });
       this.map.add(attractionsLayer);
-      // Empire State
-      this.addPoint(-73.9857, 40.7484, attractionsLayer);
-      // Liberty Statue
-      this.addPoint(-74.0445, 40.6892, attractionsLayer);
-      // Central Park
-      this.addPoint(-73.9682, 40.7850, attractionsLayer);
-      // Times Square
-      this.addPoint(-73.9851, 40.7588, attractionsLayer);
-      // Brooklyn Bridge
-      this.addPoint(-73.9970, 40.7060, attractionsLayer);
-      // Grand Central Terminal
-      this.addPoint(-73.9772, 40.7526, attractionsLayer);
+      this.addPoint(2.2945, 48.858222, attractionsLayer);
+      this.addPoint(12.49215043375397, 41.89044581077842, attractionsLayer);
+      this.addPoint(23.72585638845186, 37.97198846541044, attractionsLayer);
+      this.addPoint(2.174361164441915, 41.403714397327455, attractionsLayer);
+      this.addPoint(-0.07594254561997694, 51.50817878245558, attractionsLayer);
+      this.addPoint(12.452596879484528, 41.90417561921269, attractionsLayer);
+      this.addPoint(13.377500873726467, 52.51659756614626, attractionsLayer);
+      this.addPoint(2.3377298307301917, 48.860632275280636, attractionsLayer);
+      this.addPoint(14.411624354655284, 50.086597568982725, attractionsLayer);
+      this.addPoint(10.74962332791907, 47.55793983822316, attractionsLayer);
+      this.addPoint(-3.199477702748022, 55.94871184542899, attractionsLayer);
+      this.addPoint(-3.5877803979317164, 37.17617594219077, attractionsLayer);
+      this.addPoint(-0.14154579139590148, 51.501461610327944, attractionsLayer);
+      this.addPoint(4.884561221599788, 52.37532627195454, attractionsLayer);
+      this.addPoint(28.977602369472486, 41.00558367431737, attractionsLayer);
+      this.addPoint(-2.9334592649066145, 43.26876885213471, attractionsLayer);
+      this.addPoint(-9.210958360766035, 38.70033124954288, attractionsLayer);
 
         this.view.when(() => {
           const layerList = new LayerList({
@@ -332,26 +337,23 @@ this.map.add(stadiumsLayer);
   }
 
   addPoint(long, lat, attractionsLayer) {
-    const empireStateBuildingPoint = {
+    const attractionsPoint = {
       type: "point",
       longitude: long,
       latitude: lat
     };
 
-    const orangePointGraphic = new this._Graphic({
-      geometry: empireStateBuildingPoint,
+    const attractionsPointGraphic = new this._Graphic({
+      geometry: attractionsPoint,
       symbol: {
-        type: "simple-marker",
-        color: "#0B20F5",
-        size: "10px",
-        outline: {
-          color: "#27255C",
-          width: "1px"
-        }
+        type: "picture-marker",
+        url: "../../../assets/attractions_pin.png",
+        width: "23px",
+        height: "23px"
       },
     });
 
-    attractionsLayer.add(orangePointGraphic);
+    attractionsLayer.add(attractionsPointGraphic);
 }
 
   addLegend(stadiumsLayer, attractionsLayer) {
@@ -361,7 +363,7 @@ this.map.add(stadiumsLayer);
             {
                 layer: stadiumsLayer,
                 title: "Legend"
-            }
+            },
         ]
     });
     this.view.ui.add(legend, "bottom-left");
@@ -372,7 +374,6 @@ this.map.add(stadiumsLayer);
 
     let floodLayerView;
 
-    const cuisinesNodes = document.querySelectorAll(`.decade-item`);
     const decadesElement = document.getElementById("decades-filter");
 
     // click event handler for cuisines choices

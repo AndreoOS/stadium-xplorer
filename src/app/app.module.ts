@@ -18,11 +18,12 @@ import { ForgotPasswordComponent } from './pages/components/forgot-password/forg
 import { VerifyEmailComponent } from './pages/components/verify-email/verify-email.component';
 import { AuthService } from "./shared/services/auth.service";
 import { RouterModule } from '@angular/router';
+import { LandingPageComponent } from './pages/components/landing-page/landing-page.component';
 
 @NgModule({
   declarations: [
     AppComponent, 
-    EsriMapComponent],
+    EsriMapComponent, LandingPageComponent],
   imports: [BrowserModule, 
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),

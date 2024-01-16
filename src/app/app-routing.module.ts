@@ -8,11 +8,13 @@ import { DashboardComponent } from './pages/components/dashboard/dashboard.compo
 import { ForgotPasswordComponent } from './pages/components/forgot-password/forgot-password.component';
 import { VerifyEmailComponent } from './pages/components/verify-email/verify-email.component';
 import { AuthGuard } from './shared/guard/auth.guard';
+import { LandingPageComponent } from './pages/components/landing-page/landing-page.component';
 
 export const routes: Routes = [
   {path: 'home', component: HomeComponent},
   { path: 'map', component: EsriMapComponent },
-  { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
+  { path: '', redirectTo: '/landing-page', pathMatch: 'full' },
+  { path: 'landing-page', component: LandingPageComponent},
   { path: 'sign-in', component: SignInComponent },
   { path: 'register-user', component: SignUpComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
